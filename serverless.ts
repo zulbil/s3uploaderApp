@@ -10,6 +10,7 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    region: 'us-east-1',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -17,7 +18,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      MEDIA_S3_BUCKET: 'media-upload-bucket'
+      UPLOADER_S3_BUCKET: '${env:UPLOADER_S3_BUCKET}',
     }
   },
   // import the function via paths
@@ -40,46 +41,44 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      'MediaS3Bucket': {
-        'Type': 'AWS::S3::Bucket',
-        'Properties': {
-          'BucketName': '${self:provider.environment.MEDIA_S3_BUCKET}',
-          'CorsConfiguration' : {
-            'CorsRules' : [
+      UploaderS3Bucket: {
+        Type: 'AWS::S3::Bucket',
+        Properties: {
+          BucketName: '${self:provider.environment.UPLOADER_S3_BUCKET}',
+          CorsConfiguration : {
+            CorsRules : [
               {
-                'AllowedOrigins': ['*'],
-                'AllowedHeaders': ['*'],
-                'AllowedMethods': [
+                AllowedOrigins: ['*'],
+                AllowedHeaders: ['*'],
+                AllowedMethods: [
                   'GET',
                   'PUT',
                   'POST',
                   'DELETE',
                   'HEAD'
                 ],
-                'MaxAge': 3000
+                MaxAge: 3000
               }
             ]
           }
         }
       },
-      'BuckePoliciy': {
-        'Type': 'AWS::S3::BucketPolicy',
-        'Properties': {
-          'PolicyDocument': {
-            'Id': 'MyPolicy',
-            'Version': "2012-10-17",
-            'Statement': [
+      BuckePoliciy: {
+        Type: 'AWS::S3::BucketPolicy',
+        Properties: {
+          Bucket: { Ref: "UploaderS3Bucket" },
+          PolicyDocument: {
+            Id: 'MyBucketPolicy',
+            Version: "2012-10-17",
+            Statement: [
               {
-                "Sid": "PublicReadForGetBucketObjects",
-                "Effect": "Allow",
-                "Principal": '*',
-                "Action": 's3:GetObject',
-                "Resource": 'arn:aws:s3:::${self:provider.environment.MEDIA_S3_BUCKET}/*'
+                Sid: "PublicReadForGetBucketObjects",
+                Effect: "Allow",
+                Principal: '*',
+                Action: ['s3:GetObject'],
+                Resource: ['arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*']
               }
             ]
-          },
-          "Bucket": {
-            "Ref": "MediaS3Bucket"
           }
         }
       }
