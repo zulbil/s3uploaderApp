@@ -7,6 +7,7 @@ export default {
     {
       s3: {
         bucket: bucketName,
+        existing: true,
         event: 's3:ObjectCreated:*',
         rules: [
           {
