@@ -1,2 +1,1 @@
-export { default as hello } from './hello';
-export { default as mediaProcessor } from './file-upload';
+//export { mediaProcessor, upload, getPresignedUrl } from './files';
