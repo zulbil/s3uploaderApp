@@ -14,8 +14,9 @@
     "@middy/http-json-body-parser": "^3.4.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1348.0",
+    "aws-xray-sdk": "^3.5.0",
     "fluent-ffmpeg": "^2.1.2",
-    "jimp": "^0.3.5",
+    "jimp": "^0.22.7",
     "sharp": "^0.32.0",
     "winston": "^3.8.2"
   },
