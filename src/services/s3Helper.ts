@@ -1,6 +1,8 @@
+import { createLogger } from '@libs/logger';
 import { S3 } from 'aws-sdk';
 
 const s3 = new S3();
+const logger = createLogger('s3-logger');
 
 /**
  * 
@@ -12,14 +14,16 @@ const s3 = new S3();
  */
 async function uploadFile(bucket: string, key: string, fileContent: Buffer): Promise<void> {
     try {
+        logger.info("Upload File start");
         const uploadParams = {
             Bucket: bucket,
             Key: key,
             Body: fileContent
         };
         await s3.putObject(uploadParams).promise();
-    } catch (error) {
-        console.log(error);
+        logger.info("Upload File success...");
+    } catch (error:any) {
+        logger.error("Upload error ...", error.message);
         return null;
     }
 }

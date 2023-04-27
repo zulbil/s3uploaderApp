@@ -8,6 +8,7 @@ export default {
       s3: {
         bucket: bucketName,
         event: 's3:ObjectCreated:*',
+        existing: true,
         rules: [
           {
             prefix: 'input/'

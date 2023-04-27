@@ -1,7 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import hello from '@functions/hello';
-import mediaProcessor from '@functions/file-upload';
+import mediaProcessor from '@functions/upload';
 
 const serverlessConfiguration: AWS = {
   service: 's3uploaderapp',
@@ -18,7 +18,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      UPLOADER_S3_BUCKET: 'uploader-s3-bucket',
+      UPLOADER_S3_BUCKET: process.env.UPLOADER_S3_BUCKET ||'uploader-s3-bucket',
     }
   },
   // import the function via paths
