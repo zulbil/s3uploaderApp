@@ -68,7 +68,7 @@ async function generatePresignedUrl(bucket: string, key: string, expiresIn: numb
             Key: key,
             Expires: expiresIn
         };
-        return s3.getSignedUrlPromise('getObject', params);   
+        return s3.getSignedUrlPromise('putObject', params);   
     } catch (error) {
         console.log(error);
         return null;

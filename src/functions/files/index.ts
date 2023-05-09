@@ -18,7 +18,9 @@ export const mediaProcessor =  {
         ]
       }
     }
-  ]
+  ],
+  memorySize: 512,
+  timeout: 120
 };
 
 export const getPresignedUrl =  {

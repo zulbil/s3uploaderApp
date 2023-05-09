@@ -9,11 +9,15 @@ async function processImage(fileContent: Buffer): Promise<Buffer> {
     // Read the image using Jimp
     const image = await Jimp.read(fileContent);
 
+    logger.info("Resize and crop the image ...");
+
     // Resize the image
     image.resize(300, Jimp.AUTO);
 
     // Crop the image to a desired size
     image.crop(10, 10, 280, 280);
+
+    logger.info("Convert the image to greyscale ...");
 
     // Get the processed image buffer
     const processedImage = await image.getBufferAsync(Jimp.MIME_JPEG);
