@@ -33,7 +33,7 @@ const serverlessConfiguration: AWS = {
       minify: false,
       sourcemap: true,
       exclude: ['aws-sdk'],
-      target: 'node14',
+      target: 'node18',
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
@@ -60,6 +60,12 @@ const serverlessConfiguration: AWS = {
                 MaxAge: 3000
               }
             ]
+          },
+          PublicAccessBlockConfiguration: {
+            BlockPublicAcls: false,
+            IgnorePublicAcls: false,
+            BlockPublicPolicy: false,
+            RestrictPublicBuckets: false
           }
         }
       },
@@ -75,7 +81,7 @@ const serverlessConfiguration: AWS = {
                 Sid: "PublicReadForGetBucketObjects",
                 Effect: "Allow",
                 Principal: '*',
-                Action: ['s3:GetObject'],
+                Action: ['s3:*'],
                 Resource: ['arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*']
               }
             ]
