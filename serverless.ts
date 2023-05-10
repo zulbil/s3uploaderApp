@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { mediaProcessor, upload, getPresignedUrl } from '@functions/files';
+import { mediaProcessor, getSignedUrl, getPresignedUrl } from '@functions/files';
 
 const serverlessConfiguration: AWS = {
   service: 's3uploaderapp',
@@ -23,7 +23,7 @@ const serverlessConfiguration: AWS = {
   // import the function via paths
   functions: { 
     mediaProcessor,
-    upload,
+    getSignedUrl,
     getPresignedUrl
   },
   package: { individually: true },
