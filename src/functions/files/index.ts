@@ -41,13 +41,13 @@ export const getPresignedUrl =  {
   ]
 };
 
-export const upload =  {
-  handler: `${handlerPath(__dirname)}/handler.upload`,
+export const getSignedUrl =  {
+  handler: `${handlerPath(__dirname)}/handler.getSignedUrl`,
   events: [
     {
       http: {
         method: 'post',
-        path: 'upload',
+        path: 'get-signed-url',
         request: {
           schemas: {
             'application/json': schema

@@ -2,7 +2,7 @@ import { S3Handler, S3Event, APIGatewayProxyEvent, APIGatewayProxyResult } from 
 import { middyfy } from '@libs/lambda';
 
 import { processImage } from 'src/services/mediaProcessor';
-import { uploadFile, getFile, generatePresignedUrl } from 'src/services/s3Helper';
+import { getFile, generatePresignedUrl, generateSignedUrl } from 'src/services/s3Helper';
 import { isImage } from '@libs/utils';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { createLogger } from '@libs/logger';
@@ -61,12 +61,22 @@ export const getPresignedUrl = middyfy(async (event: APIGatewayProxyEvent): Prom
   }
 })
 
-export const upload = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { 
+export const getSignedUrl = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { 
   try {
 
+    logger.info('Generating signed URL', { body : event.body });
+
+    const name = event.body?.name;
+    logger.info('Generating signed URL', { name });
+
+    const key = `input/${name}`;
+
+    const fileUrl = await generateSignedUrl(bucketName, key);
+    logger.info('Signed URL generated', { fileUrl });
+
     return formatJSONResponse({
-      message: 'File uploaded successfully'
-    });
+      fileUrl
+    }); 
 
   } catch (error) {
     return formatJSONResponse({
