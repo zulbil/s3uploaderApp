@@ -62,10 +62,10 @@ const serverlessConfiguration: AWS = {
             ]
           },
           PublicAccessBlockConfiguration: {
-            BlockPublicAcls: false,
-            IgnorePublicAcls: false,
-            BlockPublicPolicy: false,
-            RestrictPublicBuckets: false
+            BlockPublicAcls: true,
+            IgnorePublicAcls: true,
+            BlockPublicPolicy: true,
+            RestrictPublicBuckets: true
           }
         }
       },
@@ -81,7 +81,10 @@ const serverlessConfiguration: AWS = {
                 Sid: "PublicReadForGetBucketObjects",
                 Effect: "Allow",
                 Principal: '*',
-                Action: ['s3:*'],
+                Action: [
+                  "s3:GetObject",
+                  "s3:PutObject"
+                ],
                 Resource: ['arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*']
               }
             ]
