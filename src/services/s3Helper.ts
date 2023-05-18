@@ -68,6 +68,20 @@ async function generatePresignedUrl(bucket: string, key: string, expiresIn: numb
             Key: key,
             Expires: expiresIn
         };
+        return s3.getSignedUrlPromise('putObject', params);   
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+async function generateSignedUrl(bucket: string, key: string, expiresIn: number = 3600): Promise<string> {
+    try {
+        const params = {
+            Bucket: bucket,
+            Key: key,
+            Expires: expiresIn
+        };
         return s3.getSignedUrlPromise('getObject', params);   
     } catch (error) {
         console.log(error);
@@ -75,4 +89,4 @@ async function generatePresignedUrl(bucket: string, key: string, expiresIn: numb
     }
 }
 
-export { uploadFile, getFile, generatePresignedUrl };
+export { uploadFile, getFile, generatePresignedUrl, generateSignedUrl };

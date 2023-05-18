@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { mediaProcessor, upload, getPresignedUrl } from '@functions/files';
+import { mediaProcessor, getSignedUrl, getPresignedUrl } from '@functions/files';
 
 const serverlessConfiguration: AWS = {
   service: 's3uploaderapp',
@@ -8,7 +8,7 @@ const serverlessConfiguration: AWS = {
   plugins: ['serverless-esbuild'],
   provider: {
     name: 'aws',
-    runtime: 'nodejs14.x',
+    runtime: 'nodejs18.x',
     region: 'us-east-1',
     apiGateway: {
       minimumCompressionSize: 1024,
@@ -22,9 +22,18 @@ const serverlessConfiguration: AWS = {
   },
   // import the function via paths
   functions: { 
-    mediaProcessor,
-    upload,
-    getPresignedUrl
+    mediaProcessor : {
+      ...mediaProcessor,
+      role: 'S3BucketAccessRole'
+    },
+    getSignedUrl : {
+      ...getSignedUrl,
+      role: 'S3BucketAccessRole'
+    },
+    getPresignedUrl : {
+      ...getPresignedUrl,
+      role: 'S3BucketAccessRole'
+    }
   },
   package: { individually: true },
   custom: {
@@ -33,7 +42,7 @@ const serverlessConfiguration: AWS = {
       minify: false,
       sourcemap: true,
       exclude: ['aws-sdk'],
-      target: 'node14',
+      target: 'node18',
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
@@ -60,26 +69,48 @@ const serverlessConfiguration: AWS = {
                 MaxAge: 3000
               }
             ]
+          },
+          PublicAccessBlockConfiguration: {
+            BlockPublicAcls: true,
+            IgnorePublicAcls: true,
+            BlockPublicPolicy: true,
+            RestrictPublicBuckets: true
           }
         }
       },
-      BuckePoliciy: {
-        Type: 'AWS::S3::BucketPolicy',
+      S3BucketAccessRole: {
+        Type: 'AWS::IAM::Role',
         Properties: {
-          Bucket: { Ref: "UploaderS3Bucket" },
-          PolicyDocument: {
-            Id: 'MyBucketPolicy',
-            Version: "2012-10-17",
+          RoleName: 'S3BucketAccessRole',
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
             Statement: [
               {
-                Sid: "PublicReadForGetBucketObjects",
-                Effect: "Allow",
-                Principal: '*',
-                Action: ['s3:GetObject'],
-                Resource: ['arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*']
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com',
+                },
+                Action: 'sts:AssumeRole'
               }
             ]
-          }
+          },
+          Policies: [
+            {
+              PolicyName: 'MediaProcessorPolicy',
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['s3:GetObject', 's3:PutObject'],
+                    Resource: [
+                      'arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*',
+                    ],
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     }
