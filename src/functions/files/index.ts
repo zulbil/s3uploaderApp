@@ -13,7 +13,8 @@ export const mediaProcessor =  {
         event: 's3:ObjectCreated:*',
         rules: [
           {
-            prefix: 'input/'
+            prefix: 'input/',
+            suffix: 'jpg|jpeg|png'
           }
         ]
       }
