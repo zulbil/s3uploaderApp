@@ -75,15 +75,50 @@ const serverlessConfiguration: AWS = {
                 Sid: "PublicReadForGetBucketObjects",
                 Effect: "Allow",
                 Principal: '*',
-                Action: ['s3:GetObject'],
+                Action: [
+                  's3:GetObject',
+                  's3:putObject',
+                  's3:DeleteObject'
+                ],
                 Resource: ['arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*']
               }
             ]
           }
         }
+      },
+      UploadLambdaPermission: {
+        Type: 'AWS::Lambda::Permission',
+        Properties: {
+          Action: 'lambda:InvokeFunction',
+          FunctionName: { 'Fn::GetAtt': [upload, 'Arn'] },
+          Principal: 's3.amazonaws.com',
+          SourceAccount: { Ref: 'AWS::AccountId' },
+          SourceArn: { 'Fn::Sub': 'arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*' }
+        }
+      },
+      MediaProcessorLambdaPermission: {
+        Type: 'AWS::Lambda::Permission',
+        Properties: {
+          Action: 'lambda:InvokeFunction',
+          FunctionName: { 'Fn::GetAtt': [mediaProcessor, 'Arn'] },
+          Principal: 's3.amazonaws.com',
+          SourceAccount: { Ref: 'AWS::AccountId' },
+          SourceArn: { 'Fn::Sub': 'arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*' }
+        }
+      },
+      GetPresignedUrlLambdaPermission: {
+        Type: 'AWS::Lambda::Permission',
+        Properties: {
+          Action: 'lambda:InvokeFunction',
+          FunctionName: { 'Fn::GetAtt': [getPresignedUrl, 'Arn'] },
+          Principal: 's3.amazonaws.com',
+          SourceAccount: { Ref: 'AWS::AccountId' },
+          SourceArn: { 'Fn::Sub': 'arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*' }
+        }
       }
     }
   }
 };
+
 
 module.exports = serverlessConfiguration;
