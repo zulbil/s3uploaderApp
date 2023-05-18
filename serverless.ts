@@ -90,9 +90,9 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com',
                 },
-                Action: 'sts:AssumeRole',
-              },
-            ],
+                Action: 'sts:AssumeRole'
+              }
+            ]
           },
           Policies: [
             {
@@ -106,12 +106,12 @@ const serverlessConfiguration: AWS = {
                     Resource: [
                       'arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*',
                     ],
-                  },
-                ],
-              },
+                  }
+                ]
+              }
             }
-          ],
-        },
+          ]
+        }
       }
     }
   }
