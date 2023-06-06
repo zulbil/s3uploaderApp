@@ -1,8 +1,8 @@
 import { createLogger } from '@libs/logger';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const region    =   process.env.AWS_REGION || 'us-east-1';
+const region    =   process.env.REGION || 'us-east-1';
 const s3        =   new S3Client({ region });
 const logger    =   createLogger('s3-logger');
 
@@ -97,4 +97,18 @@ async function generateSignedUrl(Bucket: string, Key: string, expiresIn: number 
     }
 }
 
-export { uploadFile, getFile, generatePresignedUrl, generateSignedUrl };
+async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
+  try {
+    const params = {
+      Bucket,
+      Key
+    };
+    await s3.send(new DeleteObjectCommand(params));
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+export { uploadFile, getFile, generatePresignedUrl, generateSignedUrl, removeFileFromS3 };

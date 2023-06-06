@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { mediaProcessor, getSignedUrl, getPresignedUrl } from '@functions/files';
+import { removeFile, getSignedUrl, getPresignedUrl } from '@functions/files';
 
 const serverlessConfiguration: AWS = {
   service: 's3uploaderapp',
@@ -18,13 +18,13 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       UPLOADER_S3_BUCKET: process.env.UPLOADER_S3_BUCKET ||'uploader-s3-bucket',
-      AWS_REGION: 'us-east-1'
+      REGION: 'us-east-1'
     }
   },
   // import the function via paths
   functions: { 
-    mediaProcessor : {
-      ...mediaProcessor,
+    removeFile : {
+      ...removeFile,
       role: 'S3BucketAccessRole'
     },
     getSignedUrl : {
