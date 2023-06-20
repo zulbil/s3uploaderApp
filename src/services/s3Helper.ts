@@ -1,5 +1,11 @@
 import { createLogger } from '@libs/logger';
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { 
+  S3Client, 
+  PutObjectCommand, 
+  GetObjectCommand, 
+  DeleteObjectCommand, 
+  ListObjectsCommand 
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const region    =   process.env.REGION || 'us-east-1';
@@ -34,31 +40,6 @@ async function uploadFile(Bucket: string, Key: string, fileContent: Buffer): Pro
  * 
  * @param bucket 
  * @param key 
- * @returns 
- * @description Function to retrieve a file from an S3 bucket
- */
-async function getFile(Bucket: string, Key: string): Promise<Buffer> {
-  try {
-    const params = {
-      Bucket,
-      Key
-    };
-    const response = await s3.send(new GetObjectCommand(params));
-    const body = await response.Body?.collect();
-    if (body instanceof Uint8Array) {
-      return Buffer.from(body);
-    }
-    return null;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
-/**
- * 
- * @param bucket 
- * @param key 
  * @param expiresIn 
  * @returns 
  * @description Function to generate a pre-signed URL for an S3 object
@@ -79,6 +60,13 @@ async function generatePresignedUrl(Bucket: string, Key: string, expiresIn: numb
   }
 }
 
+/**
+ * 
+ * @param Bucket 
+ * @param Key 
+ * @param expiresIn 
+ * @returns 
+ */
 async function generateSignedUrl(Bucket: string, Key: string, expiresIn: number = 3600): Promise<string> {
     try {
       const command = new GetObjectCommand({
@@ -111,4 +99,30 @@ async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
   }
 }
 
-export { uploadFile, getFile, generatePresignedUrl, generateSignedUrl, removeFileFromS3 };
+/**
+ * 
+ * @param Bucket 
+ * @returns 
+ */
+async function listFilesFromS3(Bucket: string, Prefix: string = ''): Promise<any> {
+  try {
+    const params = {
+      Bucket,
+      Prefix,
+      Delimiter: '/'
+    };
+    const data = await s3.send(new ListObjectsCommand(params));
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export { 
+  uploadFile, 
+  listFilesFromS3,
+  removeFileFromS3, 
+  generateSignedUrl, 
+  generatePresignedUrl
+};

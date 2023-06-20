@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import { removeFile, getSignedUrl, getPresignedUrl } from '@functions/files';
+import { removeFile, getSignedUrl, getPresignedUrl, getFiles } from '@functions/files';
 
 const serverlessConfiguration: AWS = {
   service: 's3uploaderapp',
@@ -23,6 +23,10 @@ const serverlessConfiguration: AWS = {
   },
   // import the function via paths
   functions: { 
+    getFiles: {
+      ...getFiles,
+      role: 'S3BucketAccessRole'
+    },
     removeFile : {
       ...removeFile,
       role: 'S3BucketAccessRole'
