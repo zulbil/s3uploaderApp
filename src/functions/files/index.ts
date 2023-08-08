@@ -20,7 +20,7 @@ export const getPresignedUrl =  {
     {
       http: {
         method: 'post',
-        path: 'files/upload-url',
+        path: 'files/presigned-url',
         request: {
           schemas: {
             'application/json': schema
@@ -55,8 +55,8 @@ export const removeFile = {
   events: [
     {
       http: {
-        method: 'post',
-        path: 'files/remove-file',
+        method: 'delete/{name}',
+        path: 'files',
         request: {
           schemas: {
             'application/json': schema

@@ -13,11 +13,16 @@ import { createLogger } from '@libs/logger';
 const bucketName = process.env.UPLOADER_S3_BUCKET || 'uploader-s3-bucket';
 const logger = createLogger('mediaProcessor');
 
+interface FileRequest {
+  name : string;
+}
+
 export const getPresignedUrl = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
     logger.info('Generating presigned URL', { body : event.body });
 
-    const name = event.body?.name;
+    const request : FileRequest = JSON.parse(event.body);
+    const { name } = request;
     logger.info('Generating presigned URL', { name });
 
     const key = `media/${name}`;
@@ -41,7 +46,9 @@ export const getSignedUrl = middyfy(async (event: APIGatewayProxyEvent): Promise
 
     logger.info('Generating signed URL', { body : event.body });
 
-    const name = event.body?.name;
+    const request : FileRequest = JSON.parse(event.body);
+    const { name } = request;
+
     logger.info('Generating signed URL', { name });
 
     const key = `media/${name}`;
@@ -63,7 +70,7 @@ export const getSignedUrl = middyfy(async (event: APIGatewayProxyEvent): Promise
 export const removeFile = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { 
   try {
 
-    const name = event.body?.name;
+    const name = event.pathParameters.name;
 
     const key = `media/${name}`;
 
