@@ -1,5 +1,11 @@
 import { createLogger } from '@libs/logger';
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { 
+  S3Client, 
+  PutObjectCommand, 
+  GetObjectCommand, 
+  DeleteObjectCommand, 
+  ListObjectsCommand 
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const region    =   process.env.REGION || 'us-east-1';
@@ -31,6 +37,13 @@ async function generatePresignedUrl(Bucket: string, Key: string, expiresIn: numb
   }
 }
 
+/**
+ * 
+ * @param Bucket 
+ * @param Key 
+ * @param expiresIn 
+ * @returns 
+ */
 async function generateSignedUrl(Bucket: string, Key: string, expiresIn: number = 3600): Promise<string> {
     try {
       const command = new GetObjectCommand({
@@ -63,4 +76,29 @@ async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
   }
 }
 
-export { generatePresignedUrl, generateSignedUrl, removeFileFromS3 };
+/**
+ * 
+ * @param Bucket 
+ * @returns 
+ */
+async function listFilesFromS3(Bucket: string, Prefix: string = ''): Promise<any> {
+  try {
+    const params = {
+      Bucket,
+      Prefix,
+      Delimiter: '/'
+    };
+    const data = await s3.send(new ListObjectsCommand(params));
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export { 
+  listFilesFromS3,
+  removeFileFromS3, 
+  generateSignedUrl, 
+  generatePresignedUrl
+};
