@@ -55,8 +55,8 @@ export const removeFile = {
   events: [
     {
       http: {
-        method: 'delete/{name}',
-        path: 'files',
+        method: 'delete',
+        path: 'files/{name}',
         request: {
           schemas: {
             'application/json': schema
