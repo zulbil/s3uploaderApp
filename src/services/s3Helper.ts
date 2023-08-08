@@ -6,54 +6,6 @@ const region    =   process.env.REGION || 'us-east-1';
 const s3        =   new S3Client({ region });
 const logger    =   createLogger('s3-logger');
 
-/**
- * 
- * @param bucket 
- * @param key 
- * @param fileContent 
- * @returns 
- * @description Function to upload a file to an S3 bucket
- */
-async function uploadFile(Bucket: string, Key: string, fileContent: Buffer): Promise<void> {
-  try {
-    logger.info("Upload File start");
-    const uploadParams = {
-      Bucket,
-      Key,
-      Body: fileContent
-    };
-    await s3.send(new PutObjectCommand(uploadParams));
-    logger.info("Upload File success...");
-  } catch (error: any) {
-    logger.error("Upload error ...", error.message);
-    return null;
-  }
-}
-
-/**
- * 
- * @param bucket 
- * @param key 
- * @returns 
- * @description Function to retrieve a file from an S3 bucket
- */
-async function getFile(Bucket: string, Key: string): Promise<Buffer> {
-  try {
-    const params = {
-      Bucket,
-      Key
-    };
-    const response = await s3.send(new GetObjectCommand(params));
-    const body = await response.Body?.collect();
-    if (body instanceof Uint8Array) {
-      return Buffer.from(body);
-    }
-    return null;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
 
 /**
  * 
@@ -111,4 +63,4 @@ async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
   }
 }
 
-export { uploadFile, getFile, generatePresignedUrl, generateSignedUrl, removeFileFromS3 };
+export { generatePresignedUrl, generateSignedUrl, removeFileFromS3 };
