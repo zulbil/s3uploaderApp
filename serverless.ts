@@ -111,7 +111,16 @@ const serverlessConfiguration: AWS = {
                     Resource: [
                       'arn:aws:s3:::${self:provider.environment.UPLOADER_S3_BUCKET}/*',
                     ],
-                  }
+                  },
+                  {
+                    Effect: "Allow",
+                    Action: [
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents"
+                    ],
+                    Resource: ["arn:aws:logs:*:*:*"]
+                }
                 ]
               }
             }
