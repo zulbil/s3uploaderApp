@@ -88,22 +88,3 @@ export const removeFile = middyfy(async (event: APIGatewayProxyEvent): Promise<A
   }
 })
 
-export const getFiles = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  try {
-
-    const folder = `media`;
-
-    const files = await listFilesFromS3(bucketName, folder);
-
-    logger.info('Files list in S3', { files });
-
-    return formatJSONResponse({
-      files
-    }); 
-
-  } catch (error) {
-    return formatJSONResponse({
-      message : error.message
-    }, 500);
-  }
-})

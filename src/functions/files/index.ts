@@ -1,19 +1,6 @@
 import { handlerPath } from '@libs/handler-resolver';
 import schema from './schema';
 
-export const getFiles =  {
-  handler: `${handlerPath(__dirname)}/handler.getFiles`,
-  events: [
-    {
-      http: {
-        method: 'get',
-        path: 'files',
-        cors: true
-      }
-    }
-  ]
-};
-
 export const getPresignedUrl =  {
   handler: `${handlerPath(__dirname)}/handler.getPresignedUrl`,
   events: [

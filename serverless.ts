@@ -22,11 +22,7 @@ const serverlessConfiguration: AWS = {
     }
   },
   // import the function via paths
-  functions: { 
-    getFiles: {
-      ...getFiles,
-      role: 'S3BucketAccessRole'
-    },
+  functions: {
     removeFile : {
       ...removeFile,
       role: 'S3BucketAccessRole'
