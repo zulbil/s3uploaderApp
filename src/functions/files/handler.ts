@@ -2,7 +2,6 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { middyfy } from '@libs/lambda';
 
 import { 
-  listFilesFromS3,
   generatePresignedUrl, 
   generateSignedUrl, 
   removeFileFromS3
