@@ -46,7 +46,7 @@ export const getSignedUrl = middyfy(async (event: APIGatewayProxyEvent): Promise
 
     logger.info('Generating signed URL', { body : event.body });
 
-    const request : FileRequest = JSON.parse(event.body);
+    const request : FileRequest = event.body;
     const { name } = request;
 
     logger.info('Generating signed URL', { name });
