@@ -21,7 +21,7 @@ export const getPresignedUrl = middyfy(async (event: APIGatewayProxyEvent): Prom
   try {
     logger.info('Generating presigned URL', { body : event.body });
 
-    const request : FileRequest = JSON.parse(event.body);
+    const request : FileRequest = event.body;
     const { name } = request;
     logger.info('Generating presigned URL', { name });
 
