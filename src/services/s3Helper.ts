@@ -1,56 +1,38 @@
 import { createLogger } from '@libs/logger';
-import * as AWS from 'aws-sdk'
-import * as AWSXRay from 'aws-xray-sdk'
+import { 
+  S3Client, 
+  PutObjectCommand, 
+  GetObjectCommand, 
+  DeleteObjectCommand, 
+  HeadObjectCommand,
+  ListObjectsCommand 
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const XAWS = AWSXRay.captureAWS(AWS)
-const s3: any = new XAWS.S3({ signatureVersion: 'v4' });
-
-const logger = createLogger('s3-logger');
-
-
-/**
- * 
- * @param bucket 
- * @param key 
- * @param fileContent 
- * @returns 
- * @description Function to upload a file to an S3 bucket
- */
-async function uploadFile(bucket: string, key: string, fileContent: Buffer): Promise<void> {
-    try {
-        logger.info("Upload File start");
-        const uploadParams = {
-            Bucket: bucket,
-            Key: key,
-            Body: fileContent
-        };
-        await s3.putObject(uploadParams).promise();
-        logger.info("Upload File success...");
-    } catch (error:any) {
-        logger.error("Upload error ...", error.message);
-        return null;
-    }
-}
+const region    =   process.env.REGION || 'us-east-1';
+const s3        =   new S3Client({ region });
+const logger    =   createLogger('s3-logger');
 
 /**
  * 
- * @param bucket 
- * @param key 
+ * @param Bucket 
+ * @param Key 
  * @returns 
- * @description Function to retrieve a file from an S3 bucket
+ * @description Function to check if a file exists in S3
  */
-async function getFile(bucket: string, key: string): Promise<Buffer> {
-    try {
-        const params = {
-            Bucket: bucket,
-            Key: key
-        };
-        const response = await s3.getObject(params).promise();
-        return response.Body as Buffer;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
+async function checkFileExists(Bucket: string, Key: string): Promise<Boolean> {
+  try {
+    const headParams = {
+      Bucket,
+      Key
+    };
+
+    await s3.send(new HeadObjectCommand(headParams));
+    return true;
+  } catch (error) {
+    console.log('Error:', error);
+    return false;
+  }
 }
 
 /**
@@ -61,32 +43,94 @@ async function getFile(bucket: string, key: string): Promise<Buffer> {
  * @returns 
  * @description Function to generate a pre-signed URL for an S3 object
  */
-async function generatePresignedUrl(bucket: string, key: string, expiresIn: number = 3600): Promise<string> {
+async function generatePresignedUrl(Bucket: string, Key: string, expiresIn: number = 3600): Promise<string> {
+  try {
+    const command = new PutObjectCommand({
+        Bucket,
+        Key
+    });
+    const url = await getSignedUrl(s3, command, {
+        expiresIn
+    });
+    return url;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+/**
+ * 
+ * @param Bucket 
+ * @param Key 
+ * @param expiresIn 
+ * @returns 
+ */
+async function generateSignedUrl(Bucket: string, Key: string, expiresIn: number = 3600): Promise<string> {
     try {
-        const params = {
-            Bucket: bucket,
-            Key: key,
-            Expires: expiresIn
-        };
-        return s3.getSignedUrlPromise('putObject', params);   
+      const exists = await checkFileExists(Bucket, Key)
+      if (!exists) {
+        throw new Error("Trying to generate a signed url for a file that does not exist");
+        
+      }
+      const command = new GetObjectCommand({
+        Bucket,
+        Key
+      });
+      
+      const signedUrl = await getSignedUrl(s3, command, {
+        expiresIn // Time in seconds until the URL expires
+      });
+    
+      return signedUrl;
     } catch (error) {
-        console.log(error);
-        return null;
+      console.error('Error generating signed URL:', error);
+      throw error;
     }
 }
 
-async function generateSignedUrl(bucket: string, key: string, expiresIn: number = 3600): Promise<string> {
-    try {
-        const params = {
-            Bucket: bucket,
-            Key: key,
-            Expires: expiresIn
-        };
-        return s3.getSignedUrlPromise('getObject', params);   
-    } catch (error) {
-        console.log(error);
-        return null;
+async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
+  try {
+    const exists = await checkFileExists(Bucket, Key)
+    if (!exists) {
+      throw new Error("Trying to remove a file that does not exist");
+      
     }
+    const params = {
+      Bucket,
+      Key
+    };
+    await s3.send(new DeleteObjectCommand(params));
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }
 
-export { uploadFile, getFile, generatePresignedUrl, generateSignedUrl };
+/**
+ * 
+ * @param Bucket 
+ * @returns 
+ */
+async function listFilesFromS3(Bucket: string, Prefix: string = ''): Promise<any> {
+  try {
+    const params = {
+      Bucket,
+      Prefix,
+      Delimiter: '/'
+    };
+    const data = await s3.send(new ListObjectsCommand(params));
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export { 
+  listFilesFromS3,
+  removeFileFromS3, 
+  generateSignedUrl, 
+  generatePresignedUrl
+};

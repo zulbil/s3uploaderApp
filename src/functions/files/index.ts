@@ -1,38 +1,13 @@
 import { handlerPath } from '@libs/handler-resolver';
 import schema from './schema';
 
-const bucketName = process.env.UPLOADER_S3_BUCKET || 'uploader-s3-bucket';
-
-export const mediaProcessor =  {
-  handler: `${handlerPath(__dirname)}/handler.mediaProcessor`,
-  events: [
-    {
-      s3: {
-        bucket: bucketName,
-        existing: true,
-        event: 's3:ObjectCreated:*',
-        rules: [
-          {
-            prefix: 'input/'
-          },
-          {
-            suffix: 'jpg|jpeg|png'
-          }
-        ]
-      }
-    }
-  ],
-  memorySize: 512,
-  timeout: 120
-};
-
 export const getPresignedUrl =  {
   handler: `${handlerPath(__dirname)}/handler.getPresignedUrl`,
   events: [
     {
       http: {
         method: 'post',
-        path: 'generate-presigned-url',
+        path: 'files/presigned-url',
         request: {
           schemas: {
             'application/json': schema
@@ -50,7 +25,7 @@ export const getSignedUrl =  {
     {
       http: {
         method: 'post',
-        path: 'get-signed-url',
+        path: 'files/signed-url',
         request: {
           schemas: {
             'application/json': schema
@@ -61,5 +36,24 @@ export const getSignedUrl =  {
     }
   ]
 };
+
+export const removeFile = {
+  handler: `${handlerPath(__dirname)}/handler.removeFile`,
+  events: [
+    {
+      http: {
+        method: 'delete',
+        path: 'files/{name}',
+        request: {
+          schemas: {
+            'application/json': schema
+          }
+        },
+        cors: true
+      }
+    }
+  ]
+}
+
 
 
