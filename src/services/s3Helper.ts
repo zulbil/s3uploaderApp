@@ -71,7 +71,6 @@ async function generateSignedUrl(Bucket: string, Key: string, expiresIn: number 
       const exists = await checkFileExists(Bucket, Key)
       if (!exists) {
         throw new Error("Trying to generate a signed url for a file that does not exist");
-        
       }
       const command = new GetObjectCommand({
         Bucket,
@@ -94,7 +93,6 @@ async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
     const exists = await checkFileExists(Bucket, Key)
     if (!exists) {
       throw new Error("Trying to remove a file that does not exist");
-      
     }
     const params = {
       Bucket,
