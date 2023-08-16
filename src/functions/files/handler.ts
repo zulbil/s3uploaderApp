@@ -9,31 +9,47 @@ import {
 import { formatJSONResponse } from '@libs/api-gateway';
 import { createLogger } from '@libs/logger';
 
+// Set the default bucket name for uploading files to S3
 const bucketName = process.env.UPLOADER_S3_BUCKET || 'uploader-s3-bucket';
+
+// Create a logger instance for logging
 const logger = createLogger('mediaProcessor');
 
+// Define the structure of the expected request body
 interface FileRequest {
   name : string;
 }
 
+// Define the Lambda function that generates a signed URL for file upload
 export const getPresignedUrl = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
+    // Log the start of generating a signed URL
     logger.info('Generating presigned URL', { body : event.body });
 
+    // Parse the request body to extract the file name
     const request : FileRequest = event.body;
+
+    // Create a key for the S3 object using the file name
     const { name } = request;
+
+     // Log the file name being processed
     logger.info('Generating presigned URL', { name });
 
     const key = `media/${name}`;
 
+    // Generate a signed URL for uploading the file to S3
     const uploadURL = await generatePresignedUrl(bucketName, key);
+
+    // Log the generated signed URL
     logger.info('Presigned URL generated', { uploadURL });
 
+    // Return a JSON response with the generated signed URL
     return formatJSONResponse({
       uploadURL
     }); 
 
   } catch (error) {
+    // If an error occurs, return an error JSON response
     return formatJSONResponse({
       message : error.message
     }, 500); 

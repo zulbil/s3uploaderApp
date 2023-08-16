@@ -36,26 +36,30 @@ async function checkFileExists(Bucket: string, Key: string): Promise<Boolean> {
 }
 
 /**
+ * Generates a pre-signed URL for an S3 object
  * 
- * @param bucket 
- * @param key 
- * @param expiresIn 
- * @returns 
- * @description Function to generate a pre-signed URL for an S3 object
+ * @param Bucket - The name of the S3 bucket
+ * @param Key - The object key (path) within the bucket
+ * @param expiresIn - Optional parameter specifying the URL's expiration time in seconds (default is 3600 seconds)
+ * @returns A promise that resolves to the generated pre-signed URL or null if an error occurs
  */
-async function generatePresignedUrl(Bucket: string, Key: string, expiresIn: number = 3600): Promise<string> {
+async function generatePresignedUrl(Bucket: string, Key: string, expiresIn: number = 3600): Promise<string | null> {
   try {
+    // Create a PutObjectCommand to represent uploading the object
     const command = new PutObjectCommand({
-        Bucket,
-        Key
+      Bucket,
+      Key
     });
+
+    // Generate a pre-signed URL with a specific expiration time
     const url = await getSignedUrl(s3, command, {
-        expiresIn
+      expiresIn
     });
-    return url;
+
+    return url; // Return the generated pre-signed URL
   } catch (error) {
-    console.log(error);
-    return null;
+    console.log(error); // Log any errors that occur
+    return null; // Return null if an error occurs
   }
 }
 
