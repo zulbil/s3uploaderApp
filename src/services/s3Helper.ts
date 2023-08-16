@@ -104,7 +104,7 @@ async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
     await s3.send(new DeleteObjectCommand(params));
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return false;
   }
 }

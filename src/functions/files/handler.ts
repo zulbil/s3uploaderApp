@@ -90,7 +90,11 @@ export const removeFile = middyfy(async (event: APIGatewayProxyEvent): Promise<A
 
     const key = `media/${name}`;
 
-    const fileUrl = await removeFileFromS3(bucketName, key);
+    const isRemoved = await removeFileFromS3(bucketName, key);
+
+    if (!isRemoved) {
+      throw new Error("Trying to remove a file that does not exist");
+    }
 
     return formatJSONResponse({
       message : `File ${name} removed`
