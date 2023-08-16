@@ -4,8 +4,7 @@ import {
   PutObjectCommand, 
   GetObjectCommand, 
   DeleteObjectCommand, 
-  HeadObjectCommand,
-  ListObjectsCommand 
+  HeadObjectCommand
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -110,28 +109,7 @@ async function removeFileFromS3(Bucket: string, Key: string): Promise<Boolean> {
   }
 }
 
-/**
- * 
- * @param Bucket 
- * @returns 
- */
-async function listFilesFromS3(Bucket: string, Prefix: string = ''): Promise<any> {
-  try {
-    const params = {
-      Bucket,
-      Prefix,
-      Delimiter: '/'
-    };
-    const data = await s3.send(new ListObjectsCommand(params));
-    return data;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
 export { 
-  listFilesFromS3,
   removeFileFromS3, 
   generateSignedUrl, 
   generatePresignedUrl
