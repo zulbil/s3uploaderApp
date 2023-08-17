@@ -5,7 +5,7 @@ import { removeFile, getSignedUrl, getPresignedUrl } from '@functions/files';
 const serverlessConfiguration: AWS = {
   service: 's3uploaderapp',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-offline-s3'],
   provider: {
     name: 'aws',
     runtime: 'nodejs18.x',
@@ -38,6 +38,9 @@ const serverlessConfiguration: AWS = {
   },
   package: { individually: true },
   custom: {
+    'serverless-offline': {
+      httpPort: 3000
+    },
     esbuild: {
       bundle: true,
       minify: false,

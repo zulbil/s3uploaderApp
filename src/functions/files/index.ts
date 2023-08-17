@@ -44,11 +44,6 @@ export const removeFile = {
       http: {
         method: 'delete',
         path: 'files/{name}',
-        request: {
-          schemas: {
-            'application/json': schema
-          }
-        },
         cors: true
       }
     }
